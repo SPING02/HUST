@@ -1,0 +1,211 @@
+﻿; function: show timer on time
+; close program by press any key
+
+.386
+STACK SEGMENT USE16 STACK
+	  DB 200 DUP(0)
+STACK ENDS
+
+CODE SEGMENT USE16
+	 ASSUME CS:CODE, SS:STACK
+
+	COUNT	DB 18
+	HOUR	DB ?, ?, ':'
+	MIN		DB ?, ?, ':'
+	SEC		DB ?, ?
+	BUFLEN=$-HOUR
+	CURSOR	DW ?	;cursor
+	OLDINT	DW ?, ?
+	MESSAGE DB 0DH, 0AH, 'Press any key to close program', 0dh, 0ah, '$'
+	PROMPT	DB 0DH, 0AH, '1. RUN PROCESS WITHOUT SHOWING TIMER'
+			DB 0DH, 0AH, '2. RUN PROCESS AND SHOWING TIMER'
+			DB 0DH, 0AH, 'PLEASE SELECT[1-2]: '
+			DB ODH, 0AH, '$'
+	OPTION	DB 
+	RUNNING	DB 0DH, 0AH, 'PROCESS IS RUNNING...; PRESS ANY KEY TO EXIT;','$'
+	RUN		DB 'RUNNING...','$'
+	INCORRECT DB '2. RUN PROCESS AND SHOW TIMER'
+	FLAG	DB 0
+	COMPLETE DB 'TIE DISPLAYER IS INSTALLED', '$'
+
+
+;new int 08 proc
+NEW08H PROC FAR
+	PUSHF
+	CALL	DWORD PTR OLDINT
+	DEC		COUNT
+	JZ		DISP	;DISPLAY
+	IRET
+
+	DISP: 
+	MOV		COUNT, 18
+	STI
+	PUSHA
+	PUSH	DS
+	PUSH	ES
+	MOV		AX, CS
+	MOV		DS, AX
+	MOV		ES, AX
+	CALL	GETTIME
+	MOV		BH, 0
+	MOV		AH, 3
+	INT		10H
+	MOV		CURSOR, DX
+
+	; read cursor location(DH,DL)=(row, column)
+	; save current cursor location
+	; recover cursor after showing timer on the specific location
+	MOV		DH, 0
+	MOV		DH, 80-BUFLEN
+	MOV		BP, OFFSET HOUR
+	MOV		BH, 0
+	MOV		BL, 07H
+	MOV		CX, BUFLEN
+	MOV		AL, 0
+	MOV		AH, 13H
+	INT		10H
+
+	; show time
+	MOV		DX, CURSOR
+	MOV		AH, 2
+	INT		10H
+	
+	; set cursor location
+	POP		ES
+	POP		DS
+	POPA
+	IRET
+NEW08H ENDP
+
+
+; get time
+GETTIME PROC
+	MOV		AL, 4
+	OUT		70H, AL
+	JMP		$+2
+	IN		AL, 71H
+	MOV		AH,AL
+	AND		AL,0FH
+	SHR		AH, 4
+	ADD		AX, 3030H
+	XCHG	AH,  AL
+	MOV		WORD PTR HOUR, AX
+	MOV		AL, 2
+	OUT		70H, AL
+	JMP		$+2
+	IN		AL, 71H
+	MOV		AH, AL
+	AND		AL, 0FH
+	SHR		AH, 4
+	ADD		AX, 3030H
+	XCHG	AH, AL
+	MOV		WORD PTR MIN, AX
+	MOV		AL, 0
+	OUT		70H, AL
+	JMP		$+2
+	IN		AL,  71H
+	MOV		AH,  AL
+	AND		AL,  0FH
+	SHR		AH,  4
+	ADD		AX,  3030H
+	XCHG	AH,  AL
+	MOV		WORD PTR SEC, AX
+	RET
+GETTIME ENDP
+
+
+;delay
+DELAY PROC
+	PUSH	ECX
+	MOV		ECX,0
+L1:
+	INC		ECX
+	CMP		ECX, 0FFFFFH
+	JB		L1
+	POP		ECX
+	RET
+DELAY ENDP
+
+
+;get and set int 08 address
+INTR8_ADDR PROC
+	MOV		AX, 3508H
+	INT		21H
+	MOV		OLDINT,  BX
+	MOV		OLDINT+2, ES
+	MOV		DX, OFFSET NEW08H
+	MOV		AX, 2508H
+	INT		21H
+	RET
+INTR8_ADDR ENDP
+
+
+; save new int proc in ram
+RESIDULE_INTR8 PROC
+	MOV		DX, OFFSET DELAY+15
+	MOV		CL, 4
+	SHR		DX, CL
+	ADD		DX, 10H
+	ADD		DX, 70H
+	MOV		AL, 0
+	MOV		AH, 31H
+	INT		21H
+RESIDULE_INTR8   ENDP
+
+
+
+;main proc
+BEGIN:   
+    PUSH	CS
+    POP		DS
+    MOV		AX,3508H
+    INT		21H
+    CMP		BX,OFFSET NEW08H
+    JNE		NEXT
+    LEA		DX,installed
+    MOV		AH,9
+    INT		21h
+    JMP		EXIT
+
+NEXT:
+    LEA		DX, PROMPT 
+    MOV		AH, 9
+    INT		21H
+
+    MOV		AH, 1   
+    INT		21H
+
+    MOV		OPTION, AL
+
+    LEA		DX, MESSAGE  
+    MOV		AH, 9  
+    INT		21H
+
+    CMP		OPTION, '1'
+    JZ		DISP_CHARS                                
+    CALL	INTR8_ADDR    
+                                        
+DISP_CHARS:
+	LEA		DX, RUN    
+	MOV		AH, 9  
+	INT		21H
+	CALL	DELAY        
+	MOV		AH, 0BH     
+	INT		21H
+	CMP		AL, 0   
+	JNZ		EXIT
+	JMP		DISP_CHARS
+EXIT:
+	CMP		OPTION, '1'
+	JZ		EXIT1
+	CMP		OPTION, '2'
+	JZ		EXIT2
+	JMP  EXIT2
+EXIT1: 
+	MOV		AH,4CH
+	INT		21H
+EXIT2:
+	CALL	RESIDULE_INTR8 
+CODE ENDS
+
+END  BEGIN

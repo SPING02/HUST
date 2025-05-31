@@ -1,0 +1,13 @@
+﻿  ds3.cpp
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(13,1): warning C4005: 'OVERFLOW': macro redefinition
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt\corecrt_math.h(965): message : see previous definition of 'OVERFLOW'
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(172,13): warning C4551: function call missing argument list
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(199,13): warning C4551: function call missing argument list
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(271,14): warning C4551: function call missing argument list
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(283,13): warning C4551: function call missing argument list
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(54,19): warning C4101: 'j': unreferenced local variable
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(55,11): warning C4101: 'fp': unreferenced local variable
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(53,9): warning C4101: 'flag': unreferenced local variable
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(594,27): warning C4101: 'i': unreferenced local variable
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\ds3.cpp(469): warning C4715: 'InsertNode': not all control paths return a value
+  ds3.vcxproj -> C:\Users\pings\Desktop\课堂\数据结构\实验\实验3\x64\Debug\ds3.exe

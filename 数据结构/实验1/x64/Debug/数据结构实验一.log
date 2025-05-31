@@ -1,0 +1,4 @@
+﻿  数据结构实验一.cpp
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验1\数据结构实验一.cpp(576): warning C4715: 'LocateElem': not all control paths return a value
+C:\Users\pings\Desktop\课堂\数据结构\实验\实验1\数据结构实验一.cpp(734): warning C4715: 'MaxSubArray': not all control paths return a value
+  数据结构实验一.vcxproj -> C:\Users\pings\Desktop\课堂\数据结构\实验\实验1\x64\Debug\数据结构实验一.exe

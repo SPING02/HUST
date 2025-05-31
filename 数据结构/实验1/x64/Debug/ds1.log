@@ -1,0 +1,4 @@
+﻿  ds1.cpp
+C:\Users\pings\Desktop\ds1\ds1.cpp(576): warning C4715: 'LocateElem': not all control paths return a value
+C:\Users\pings\Desktop\ds1\ds1.cpp(734): warning C4715: 'MaxSubArray': not all control paths return a value
+  ds1.vcxproj -> C:\Users\pings\Desktop\ds1\x64\Debug\ds1.exe
